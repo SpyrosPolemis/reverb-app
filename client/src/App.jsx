@@ -31,7 +31,7 @@ function App() {
         </a>
       </div>
       <h1>Vite + React</h1>
-      
+
       {/* Display the message from the server */}
       <p><strong>Message from server:</strong> {message}</p>
 

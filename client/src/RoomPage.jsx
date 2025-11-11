@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { socket } from './socket.js';
+import './RoomPage.css';
 
 function RoomPage() {
     const { roomCode } = useParams(); // Get room code from URL (e.g., /room/ABCD)
@@ -51,32 +52,41 @@ function RoomPage() {
     };
 
     return (
-        <div>
-            <h1>Welcome to Room: {roomCode}</h1>
+    <div className="room-page">
+        <h1>Welcome to Room: {roomCode}</h1>
 
-            <form onSubmit={handlePostQuestion}>
-                <input
-                    type="text"
-                    placeholder="Ask a question..."
-                    value={newQuestionText}
-                    onChange={(e) => setNewQuestionText(e.target.value)}
-                />
-                <button type="submit">Post</button>
-            </form>
+        <form onSubmit={handlePostQuestion} className="question-form">
+        <input
+            type="text"
+            placeholder="Ask a question..."
+            value={newQuestionText}
+            onChange={(e) => setNewQuestionText(e.target.value)}
+        />
+        <button type="submit">Post</button>
+        </form>
 
-            <div className="question-list">
-                <h2>Questions:</h2>
-                {questions
-                    .sort((a, b) => b.votes - a.votes) // Show highest voted first
-                    .map((q) => (
-                        <div key={q.id} style={{ border: '1px solid #ccc', margin: '10px', padding: '10px' }}>
-                            <p>{q.text}</p>
-                            <p>Votes: {q.votes}</p>
-                            <button onClick={() => handleVote(q.id)}>Vote Up</button>
-                        </div>
-                    ))}
+        <div className="question-list">
+        <h2>Questions:</h2>
+
+        {questions
+            .sort((a, b) => b.votes - a.votes)
+            .map((q) => (
+            <div key={q.id} className="question-card">
+                <p>{q.text}</p>
+                <div id='bot-sect'>
+                    <button
+                    className="vote-button"
+                    onClick={() => handleVote(q.id)}
+                    >
+                    Vote Up
+                    </button>
+                    <p>Votes: {q.votes}</p>
+                </div>
             </div>
+            ))}
         </div>
-    );
+    </div>
+);
+
 }
 export default RoomPage;

@@ -1,0 +1,96 @@
+html {
+  width: 100vw;
+  display: flex;
+  align-items: start;
+}
+
+#root {
+  height: 100vh;
+}
+
+/* Page container */
+
+.room-page {
+  margin: 0 auto;
+  font-family: system-ui, sans-serif;
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  flex-direction: column;
+  width: 100vw;
+}
+
+/* Header */
+.room-page h1 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+/* Form styling */
+.question-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.question-form input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.question-form button {
+  padding: 10px 16px;
+  background: #4b7bec;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.question-form button:hover {
+  background: #3867d6;
+}
+
+/* Question list */
+.question-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.question-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 8px;
+  background: #fafafa;
+  color: black;
+  min-width: 80vw;
+}
+
+.question-card p {
+  margin: 6px 0;
+}
+
+.vote-button {
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: #20bf6b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.vote-button:hover {
+  background: #1e9f5c;
+}
+
+#bot-sect {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}

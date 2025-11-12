@@ -1,49 +1,91 @@
-// client/src/App.jsx
+import React, { useState, useEffect, useCallback } from 'react';
+import { socket } from './socket'; // Import the shared socket instance
 
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import Header from './components/HeaderComponent.jsx';
+import RoomForm from './components/RoomFormComponent.jsx';
+import TeacherPage from './TeacherPage.jsx';
+import StudentPage from './StudentPage.jsx';
+import HomePage from './HomePage.jsx';
 
 function App() {
-  const [message, setMessage] = useState('');
+  const [page, setPage] = useState('home'); // 'home', 'teacher', 'student'
+  const [roomCode, setRoomCode] = useState('');
+  const [isInRoom, setIsInRoom] = useState(false);
+  const [joining, setJoining] = useState(false);
 
-  // Fetch the message from the backend when the component mounts
   useEffect(() => {
-    axios.get('/api')
-      .then((response) => {
-        setMessage(response.data.message);
-      })
-      .catch((error) => {
-        console.error("There was an error fetching the data!", error);
-      });
-  }, []); // The empty array ensures this effect runs only once
+    function onConnect() {
+      console.log('Connected to socket server');
+    }
+
+    function onDisconnect() {
+      console.log('Disconnected from socket server');
+    }
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+
+    return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+    };
+  }, []);
+
+  const handleJoinRoom = useCallback(() => {
+    if (roomCode) {
+      setJoining(true);
+      socket.emit('join_room', roomCode);
+      setTimeout(() => {
+        setIsInRoom(true);
+        setJoining(false);
+      }, 500);
+    }
+  }, [roomCode]);
+
+  const renderPage = () => {
+    if (page !== 'home' && !isInRoom) {
+      return (
+        <div className="flex-grow flex items-center justify-center">
+          <RoomForm
+            roomCode={roomCode}
+            setRoomCode={setRoomCode}
+            onJoin={handleJoinRoom}
+            joining={joining}
+            actionText={page === 'teacher' ? 'Create/Join Room' : 'Join Room'}
+          />
+        </div>
+      );
+    }
+
+    switch (page) {
+      case 'teacher':
+        return <TeacherPage roomCode={roomCode} />;
+      case 'student':
+        return <StudentPage roomCode={roomCode} />;
+      case 'home':
+      default:
+        return (
+          <div className="flex-grow flex items-center justify-center">
+            <HomePage onSelectRole={setPage} />
+          </div>
+        );
+    }
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-
-      {/* Display the message from the server */}
-      <p><strong>Message from server:</strong> {message}</p>
-
-      <div className="card">
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="min-h-screen bg-gray-100 flex flex-col font-sans">
+      {<Header onHomeClick={() => {
+        setPage('home')
+        setIsInRoom(false);
+        setRoomCode('');
+      }} />}
+      <main className="flex-grow container mx-auto p-4 md:p-8">
+        {renderPage()}
+      </main>
+      <footer className="text-center p-4 text-gray-500 text-sm">
+        REVERB Q&amp;A App
+      </footer>
+    </div>
   );
 }
 

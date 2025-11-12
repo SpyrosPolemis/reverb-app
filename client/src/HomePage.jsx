@@ -1,49 +1,33 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Assuming you use React Router
+import React from 'react';
 
-function HomePage() {
-    const [roomCode, setRoomCode] = useState('');
-    const navigate = useNavigate();
-
-    const handleCreateRoom = async () => {
-        try {
-            // Use standard HTTP POST to create the room
-            const response = await axios.post('/api/create-room');
-            const newRoomCode = response.data.roomCode;
-            navigate(`/room/${newRoomCode}`); // Navigate to the new room
-        } catch (error) {
-            console.error("Error creating room", error);
-        }
-    };
-
-    const handleJoinRoom = async (e) => {
-        e.preventDefault();
-        try {
-            // Use standard HTTP GET to check if room exists
-            await axios.get(`/api/check-room/${roomCode}`);
-            navigate(`/room/${roomCode}`); // Room exists, navigate to it
-        } catch (error) {
-            console.error("Error joining room", error);
-            alert("Room not found!");
-        }
-    };
-
-    return (
-        <div>
-            <button onClick={handleCreateRoom}>Create a New Room</button>
-            <hr />
-            <form onSubmit={handleJoinRoom}>
-                <input
-                    type="text"
-                    placeholder="Enter 4-letter code"
-                    value={roomCode}
-                    onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-                    maxLength={4}
-                />
-                <button type="submit">Join Room</button>
-            </form>
+const HomePage = ({ onSelectRole }) => (
+    <div className="flex flex-col md:flex-row gap-8 justify-center items-center">
+        <div className="bg-white p-8 rounded-lg shadow-xl border border-gray-200 text-center w-full max-w-sm">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">I am a Teacher</h2>
+            <p className="text-gray-600 mb-6">
+                Create a room, send questions, and view student answers in real-time.
+            </p>
+            <button
+                onClick={() => onSelectRole('teacher')}
+                className="w-full py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+            >
+                Go to Teacher Dashboard
+            </button>
         </div>
-    );
-}
+
+        <div className="bg-white p-8 rounded-lg shadow-xl border border-gray-200 text-center w-full max-w-sm">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">I am a Student</h2>
+            <p className="text-gray-600 mb-6">
+                Join a room, receive live questions from your teacher, and send your answers.
+            </p>
+            <button
+                onClick={() => onSelectRole('student')}
+                className="w-full py-3 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 transition-colors"
+            >
+                Go to Student Dashboard
+            </button>
+        </div>
+    </div>
+);
+
 export default HomePage;

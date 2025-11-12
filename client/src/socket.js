@@ -1,4 +1,8 @@
-import { io } from "socket.io-client";
+import { io } from 'socket.io-client';
 
-const URL = "http://localhost:5001"; // Adjust if your server runs elsewhere
-export const socket = io(URL);
+// The URL of your backend server
+const SOCKET_SERVER_URL = 'http://localhost:3001';
+
+// Create and export the socket instance
+// This ensures there is only one connection shared across your app
+export const socket = io(SOCKET_SERVER_URL);

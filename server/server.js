@@ -37,14 +37,15 @@ io.on('connection', (socket) => {
 
   // Event for a student sending an answer
   socket.on('send_answer', (data) => {
-    const { roomCode, answer } = data;
+    const { roomCode, answer, studentName } = data;
     // Send the answer to everyone else in the room (i.e., the teacher)
     const answerData = {
       answer: answer,
       studentId: socket.id, // Identify which student sent the answer
+      studentName: studentName
     };
     socket.to(roomCode).emit('receive_answer', answerData);
-    console.log(`Answer received from ${socket.id} in room ${roomCode}: ${answer}`);
+    console.log(`Answer received from ${studentName} in room ${roomCode}: ${answer}`);
   });
 
   // Handle disconnection

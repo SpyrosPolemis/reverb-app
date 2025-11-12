@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { socket } from './socket.js'; // Import the shared socket instance
+import { socket } from './Socket.js'; // Import the shared socket instance
 
 // Teacher Page Component
 const TeacherPage = ({ roomCode }) => {
@@ -65,7 +65,7 @@ const TeacherPage = ({ roomCode }) => {
                         answers.map((ans, index) => (
                             <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                                 <p className="text-sm font-semibold text-gray-500">
-                                    Student: {ans.studentId.substring(0, 6)}...
+                                    Student: {ans.studentName}
                                 </p>
                                 <p className="text-lg text-gray-800">{ans.answer}</p>
                             </div>

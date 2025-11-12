@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { socket } from './socket.js'; // Import the shared socket instance
+import { socket } from './Socket.js'; // Import the shared socket instance
 
-const StudentPage = ({ roomCode }) => {
+const StudentPage = ({ roomCode, studentName }) => {
     const [currentQuestion, setCurrentQuestion] = useState('');
     const [answer, setAnswer] = useState('');
 
@@ -21,7 +21,7 @@ const StudentPage = ({ roomCode }) => {
 
     const handleSendAnswer = () => {
         if (answer.trim() === '') return;
-        socket.emit('send_answer', { roomCode, answer });
+        socket.emit('send_answer', { roomCode, answer, studentName });
         setAnswer(''); // Clear input after sending
     };
 

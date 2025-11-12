@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { socket } from './socket'; // Import the shared socket instance
+import { socket } from './Socket.js'; // Import the shared socket instance
 
 import Header from './components/HeaderComponent.jsx';
 import RoomForm from './components/RoomFormComponent.jsx';
@@ -12,6 +12,7 @@ function App() {
   const [roomCode, setRoomCode] = useState('');
   const [isInRoom, setIsInRoom] = useState(false);
   const [joining, setJoining] = useState(false);
+  const [studentName, setStudentName] = useState('');
 
   useEffect(() => {
     function onConnect() {
@@ -51,6 +52,8 @@ function App() {
             setRoomCode={setRoomCode}
             onJoin={handleJoinRoom}
             joining={joining}
+            studentName={studentName}
+            setStudentName={setStudentName}
             actionText={page === 'teacher' ? 'Create/Join Room' : 'Join Room'}
           />
         </div>
@@ -61,7 +64,7 @@ function App() {
       case 'teacher':
         return <TeacherPage roomCode={roomCode} />;
       case 'student':
-        return <StudentPage roomCode={roomCode} />;
+        return <StudentPage roomCode={roomCode} studentName={studentName} />;
       case 'home':
       default:
         return (

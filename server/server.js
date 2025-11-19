@@ -29,23 +29,27 @@ io.on('connection', (socket) => {
 
   // Event for the teacher sending a question
   socket.on('send_question', (data) => {
-    const { roomCode, question } = data;
-    // Broadcast the question to everyone else in the room (i.e., the students)
-    socket.to(roomCode).emit('receive_question', question);
-    console.log(`Question sent to room ${roomCode}: ${question}`);
+    const { roomCode, question, questionId } = data;
+
+    io.to(roomCode).emit('receive_question', {
+      question,
+      questionId,
+    });
+
+    console.log(`Question sent to room ${roomCode}:`, question, questionId);
   });
 
   // Event for a student sending an answer
   socket.on('send_answer', (data) => {
-    const { roomCode, answer, studentName } = data;
-    // Send the answer to everyone else in the room (i.e., the teacher)
-    const answerData = {
-      answer: answer,
-      studentId: socket.id, // Identify which student sent the answer
-      studentName: studentName
-    };
-    socket.to(roomCode).emit('receive_answer', answerData);
-    console.log(`Answer received from ${studentName} in room ${roomCode}: ${answer}`);
+    const { roomCode, answer, studentName, questionId } = data;
+
+    io.to(roomCode).emit('receive_answer', {
+      answer,
+      studentName,
+      questionId
+    });
+
+    console.log(`Answer from ${studentName} (QID ${questionId}) in room ${roomCode}:`, answer);
   });
 
   // Handle disconnection

@@ -8,25 +8,41 @@ html {
   height: 100vh;
 }
 
-/* Page container */
-
+/* PAGE CONTAINER */
 .room-page {
   margin: 0 auto;
   font-family: system-ui, sans-serif;
   display: flex;
-  justify-content: start;
-  align-items: center;
   flex-direction: column;
+  align-items: center;
   width: 100vw;
 }
 
-/* Header */
+/* HEADER */
 .room-page h1 {
   font-size: 1.8rem;
   margin-bottom: 20px;
 }
 
-/* Form styling */
+/* TWO-COLUMN MAIN LAYOUT */
+#content-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  justify-content: space-between;
+  width: 100%;
+  gap: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* EACH COLUMN */
+.column {
+  flex: 1;
+  min-width: 350px;
+}
+
+/* FORM */
 .question-form {
   display: flex;
   gap: 10px;
@@ -55,7 +71,7 @@ html {
   background: #3867d6;
 }
 
-/* Question list */
+/* QUESTION CARDS */
 .question-list {
   display: flex;
   flex-direction: column;
@@ -68,7 +84,7 @@ html {
   border-radius: 8px;
   background: #fafafa;
   color: black;
-  min-width: 80vw;
+  width: 100%;
 }
 
 .question-card p {
@@ -87,10 +103,4 @@ html {
 
 .vote-button:hover {
   background: #1e9f5c;
-}
-
-#bot-sect {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
 }

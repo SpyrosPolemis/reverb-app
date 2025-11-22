@@ -1,4 +1,3 @@
-// backend/server.js
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -9,56 +8,69 @@ app.use(cors());
 
 const server = http.createServer(app);
 
-// Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: '*',
-    methods: ['GET', 'POST'],
+    origin: "*",
+    methods: ["GET", "POST"],
   },
 });
 
-// Listen for new connections
-io.on('connection', (socket) => {
-  console.log(`A user connected: ${socket.id}`);
+// Store student questions per room
+let roomQuestions = {}; // { roomCode: [ {id, text, upvotes, studentName} ] }
 
-  // Event for a user (teacher or student) to join a room
+io.on('connection', (socket) => {
+  console.log(`User connected: ${socket.id}`);
+
   socket.on('join_room', (roomCode) => {
     socket.join(roomCode);
-    console.log(`User ${socket.id} joined room: ${roomCode}`);
+    console.log(`User ${socket.id} joined ${roomCode}`);
   });
 
-  // Event for the teacher sending a question
-  socket.on('send_question', (data) => {
-    const { roomCode, question, questionId } = data;
-
-    io.to(roomCode).emit('receive_question', {
-      question,
-      questionId,
-    });
-
-    console.log(`Question sent to room ${roomCode}:`, question, questionId);
+  // Teacher sends quiz question
+  socket.on('send_question', ({ roomCode, question, questionId }) => {
+    socket.to(roomCode).emit('receive_question', { question, questionId });
   });
 
-  // Event for a student sending an answer
+  // Student sends quiz answer
   socket.on('send_answer', (data) => {
-    const { roomCode, answer, studentName, questionId } = data;
-
-    io.to(roomCode).emit('receive_answer', {
-      answer,
-      studentName,
-      questionId
-    });
-
-    console.log(`Answer from ${studentName} (QID ${questionId}) in room ${roomCode}:`, answer);
+    socket.to(data.roomCode).emit('receive_answer', data);
   });
 
-  // Handle disconnection
+  // Student submits a question
+  socket.on("student_submit_question", ({ roomCode, text, studentName }) => {
+    if (!roomQuestions[roomCode]) roomQuestions[roomCode] = [];
+
+    const newQ = {
+      id: Date.now(),
+      text,
+      studentName,
+      upvotes: 0
+    };
+
+    roomQuestions[roomCode].push(newQ);
+
+    io.to(roomCode).emit("update_student_questions", roomQuestions[roomCode]);
+  });
+
+  // Student upvotes question
+  socket.on("student_upvote_question", ({ roomCode, questionId }) => {
+    const questions = roomQuestions[roomCode];
+    if (!questions) return;
+
+    const q = questions.find(q => q.id === questionId);
+    if (q) q.upvotes++;
+
+    // Sort by upvotes
+    questions.sort((a, b) => b.upvotes - a.upvotes);
+
+    io.to(roomCode).emit("update_student_questions", questions);
+  });
+
   socket.on('disconnect', () => {
     console.log(`User disconnected: ${socket.id}`);
   });
 });
 
-const PORT = process.env.PORT || 3001;
-server.listen(PORT, () => {
-  console.log(`Real-time server listening on *:${PORT}`);
+server.listen(3001, () => {
+  console.log("Server running on port 3001");
 });

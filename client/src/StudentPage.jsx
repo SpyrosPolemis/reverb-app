@@ -1,29 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { socket } from './Socket.js'; // Import the shared socket instance
+import { socket } from './Socket.js';
 
 const StudentPage = ({ roomCode, studentName }) => {
-    const [currentQuestion, setCurrentQuestion] = useState('');
+    const [questions, setQuestions] = useState([]); 
     const [answer, setAnswer] = useState('');
+    const [activeQuestionId, setActiveQuestionId] = useState(null);
 
-    // Listen for new questions from the teacher
+    // Receive questions
     useEffect(() => {
-        const handleReceiveQuestion = (question) => {
-            setCurrentQuestion(question);
-            setAnswer(''); // Clear old answer when a new question arrives
+        const handleReceiveQuestion = ({ question, questionId }) => {
+            setQuestions(prev => [...prev, { id: questionId, text: question }]);
+            setActiveQuestionId(questionId); // auto-select newest question
+            setAnswer('');
         };
 
         socket.on('receive_question', handleReceiveQuestion);
-
-        return () => {
-            socket.off('receive_question', handleReceiveQuestion);
-        };
+        return () => socket.off('receive_question', handleReceiveQuestion);
     }, []);
 
     const handleSendAnswer = () => {
-        if (answer.trim() === '') return;
-        socket.emit('send_answer', { roomCode, answer, studentName });
-        setAnswer(''); // Clear input after sending
+        if (answer.trim() === '' || !activeQuestionId) return;
+
+        socket.emit('send_answer', {
+            roomCode,
+            answer,
+            studentName,
+            questionId: activeQuestionId
+        });
+
+        setAnswer('');
     };
+
+    const activeQuestion = questions.find(q => q.id === activeQuestionId);
 
     return (
         <div className="container mx-auto p-4 md:p-8 space-y-6">
@@ -32,16 +40,40 @@ const StudentPage = ({ roomCode, studentName }) => {
                 Room: <span className="font-semibold text-indigo-600">{roomCode}</span>
             </p>
 
-            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 min-h-[150px] flex flex-col justify-center">
-                <h3 className="text-2xl font-semibold mb-4 text-gray-700">Question from Teacher</h3>
-                {currentQuestion ? (
-                    <p className="text-xl text-gray-800">{currentQuestion}</p>
+            {/* Question Display */}
+            <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200 min-h-[150px]">
+                <h3 className="text-2xl font-semibold mb-4 text-gray-700">Question</h3>
+                {activeQuestion ? (
+                    <p className="text-xl text-gray-800">{activeQuestion.text}</p>
                 ) : (
                     <p className="text-gray-500 italic">Waiting for a question...</p>
                 )}
             </div>
 
-            {currentQuestion && (
+            {/* Choose question (only if multiples exist) */}
+            {questions.length > 1 && (
+                <div className="flex gap-3 flex-wrap">
+                    {questions.map(q => (
+                        <button
+                            key={q.id}
+                            onClick={() => {
+                                setActiveQuestionId(q.id);
+                                setAnswer('');
+                            }}
+                            className={`px-4 py-2 rounded-lg border ${
+                                activeQuestionId === q.id
+                                    ? 'bg-indigo-600 text-white'
+                                    : 'bg-white'
+                            }`}
+                        >
+                            {q.text.slice(0,40)}...
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            {/* Answer box */}
+            {activeQuestion && (
                 <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
                     <h3 className="text-2xl font-semibold mb-4 text-gray-700">Your Answer</h3>
                     <div className="flex flex-col sm:flex-row gap-4">

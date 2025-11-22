@@ -2,7 +2,7 @@
 
 ### Live Lecture Feedback App
 
-Reverb is a real-time web application designed to enhance classroom interaction by allowing students to provide instant feedback during lectures. Lecturers can monitor student engagement, identify any confusion, and adapt their teaching style on the fly.
+Reverb is a real-time web application designed to enhance classroom interaction by allowing students to provide instant feedback during lectures. Lecturers can monitor student engagement, identify any confusion, answer questions and adapt their teaching style on the fly.
 
 ### Features
 
